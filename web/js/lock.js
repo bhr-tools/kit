@@ -9,6 +9,8 @@
 //     onUnlocked: async () => {},    // load the data
 //   });
 //   await lock.start();              // shows setup or login when needed
+//   (an app with its own start-up, offline for instance, calls
+//   lock.showSetup() / lock.showLogin() itself)
 //   lockButton.onclick = () => lock.menu(lockButton);
 //   api 401 → lock.showLogin();
 
@@ -171,6 +173,7 @@ export function createLock({ appName, beforeLock = async () => true, afterLock =
       return showLogin();
     },
 
+    showSetup,
     showLogin,
     changePassword,
     lock,
