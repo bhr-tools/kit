@@ -61,3 +61,9 @@ test('help groups keep table order and skip hidden bindings', () => {
   assert.deepEqual(groups[1].rows[0].keys, ['1–9']);
   assert.ok(!groups.flatMap((g) => g.rows).some((r) => r.label === 'Hidden'));
 });
+
+test('bindings without run are only documented', () => {
+  const t = [{ keys: ['C-Enter'], label: 'Save', group: 'Details' }, { keys: ['j'], label: 'Next', run() {} }];
+  assert.equal(createMatcher(() => t).feed('C-Enter'), null);
+  assert.deepEqual(helpGroups(t)[0], { group: 'Details', rows: [{ label: 'Save', keys: ['Ctrl+Enter'] }] });
+});

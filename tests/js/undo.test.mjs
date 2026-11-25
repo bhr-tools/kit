@@ -42,3 +42,16 @@ test('the stack is bounded', () => {
   for (let i = 0; i < 5; i++) undo.push({ label: `${i}`, undo() {} }, { quiet: true });
   assert.equal(undo.size, 3);
 });
+
+test('an undo that reports false stays, a custom message is shown', async () => {
+  const r = recorder();
+  const undo = createUndo({ toast: r.toast });
+  let ok = false;
+  undo.push({ label: 'Done', undone: 'Restored "Milk"', undo: () => ok }, { quiet: true });
+  assert.equal(await undo.run(), false);
+  assert.equal(undo.size, 1);
+  assert.equal(r.toasts.length, 0);
+  ok = true;
+  assert.equal(await undo.run(), true);
+  assert.equal(r.toasts.at(-1).msg, 'Restored "Milk"');
+});
