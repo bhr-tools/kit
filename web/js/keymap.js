@@ -9,6 +9,7 @@
 //   { …, hidden: true }       left out of the ? help
 //   { keys, label, group }    without run: only listed in the ? help (keys a
 //                             dialog handles itself, such as Ctrl+Enter)
+//   { …, helpKeys: ['1', '2', '3'] }  what the help shows instead of keys
 //
 // Conventions of every app: u = undo, ? = help, / = search, Esc = clear.
 
@@ -85,7 +86,8 @@ export function helpGroups(table) {
     if (b.hidden || !b.label) continue;
     const name = b.group || 'General';
     if (!groups.has(name)) groups.set(name, []);
-    groups.get(name).push({ label: b.label, keys: b.digit ? ['1–9'] : b.keys.map(displayKey) });
+    const keys = b.helpKeys ?? (b.digit ? ['1–9'] : b.keys);
+    groups.get(name).push({ label: b.label, keys: keys.map(displayKey) });
   }
   return [...groups].map(([group, rows]) => ({ group, rows }));
 }

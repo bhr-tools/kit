@@ -67,3 +67,8 @@ test('bindings without run are only documented', () => {
   assert.equal(createMatcher(() => t).feed('C-Enter'), null);
   assert.deepEqual(helpGroups(t)[0], { group: 'Details', rows: [{ label: 'Save', keys: ['Ctrl+Enter'] }] });
 });
+
+test('helpKeys replace the keys shown', () => {
+  const t = [{ digit: true, helpKeys: ['1', '2', '3'], label: 'Priority', run() {} }];
+  assert.deepEqual(helpGroups(t)[0].rows[0].keys, ['1', '2', '3']);
+});
