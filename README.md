@@ -26,6 +26,10 @@ The browser files are embedded in the module (`web.Files`) and served under
     go test ./...
     node --test "tests/js/*.test.mjs"
 
+An app's Node tests reach the kit by URL like the browser:
+
+    node --import ./vendor/github.com/bhr-tools/kit/web/node/register.mjs --test "tests/js/*.test.mjs"
+
 ## Demo and browser tests
 
 `cmd/demo` serves a page using every primitive (keys and ? help, undo,
