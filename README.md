@@ -19,7 +19,7 @@ components.
     go get github.com/bhr-tools/kit && go mod vendor
 
 The browser files are embedded in the module (`web.Files`) and served under
-`/kit/`: `@import url("/kit/css/base.css");` at the top of the app's CSS.
+`/kit/`: `@import url("/kit/css/kit.css");` at the top of the app's CSS, then its overrides.
 
 ## Tests
 
