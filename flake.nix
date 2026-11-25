@@ -9,6 +9,9 @@
       forAll = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
     in
     {
+      # NixOS module shared by the apps (nix/app-module.nix).
+      lib.mkAppModule = import ./nix/app-module.nix;
+
       devShells = forAll (pkgs: {
         default = pkgs.mkShell { buildInputs = with pkgs; [ go gopls nodejs ]; };
       });
