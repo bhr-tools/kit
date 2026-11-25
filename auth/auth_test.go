@@ -162,3 +162,12 @@ func hexs(b []byte) string {
 	}
 	return string(out)
 }
+
+func TestLinkSecretIsStable(t *testing.T) {
+	a, _ := setup(t, false)
+	one, err := a.LinkSecret()
+	two, _ := LinkSecret(a.db)
+	if err != nil || len(one) != 32 || string(one) != string(two) {
+		t.Fatalf("%x %x %v", one, two, err)
+	}
+}

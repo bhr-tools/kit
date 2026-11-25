@@ -451,17 +451,23 @@ func sessionCutoff() string {
 // Links signed with it work without the session cookie, which a home screen
 // app on iOS does not share with the viewer it opens files in.
 func (a *Auth) LinkSecret() ([]byte, error) {
+	return LinkSecret(a.db)
+}
+
+// LinkSecret is Auth.LinkSecret for a store that has no Auth at hand (it
+// builds its files.Store before the API exists). The auth tables must exist.
+func LinkSecret(db *sql.DB) ([]byte, error) {
 	var stored string
-	err := a.db.QueryRow(`SELECT value FROM auth_settings WHERE key = 'link_secret'`).Scan(&stored)
+	err := db.QueryRow(`SELECT value FROM auth_settings WHERE key = 'link_secret'`).Scan(&stored)
 	if err == sql.ErrNoRows {
 		b := make([]byte, 32)
 		if _, err := rand.Read(b); err != nil {
 			return nil, err
 		}
-		if _, err := a.db.Exec(`INSERT OR IGNORE INTO auth_settings (key, value) VALUES ('link_secret', ?)`, hex.EncodeToString(b)); err != nil {
+		if _, err := db.Exec(`INSERT OR IGNORE INTO auth_settings (key, value) VALUES ('link_secret', ?)`, hex.EncodeToString(b)); err != nil {
 			return nil, err
 		}
-		err = a.db.QueryRow(`SELECT value FROM auth_settings WHERE key = 'link_secret'`).Scan(&stored)
+		err = db.QueryRow(`SELECT value FROM auth_settings WHERE key = 'link_secret'`).Scan(&stored)
 	}
 	if err != nil {
 		return nil, err
