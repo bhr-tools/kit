@@ -4,5 +4,5 @@ package web
 
 import "embed"
 
-//go:embed css
+//go:embed css js sw.js
 var Files embed.FS

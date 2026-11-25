@@ -13,7 +13,7 @@
         default = pkgs.mkShell { buildInputs = with pkgs; [ go gopls nodejs ]; };
       });
 
-      # `nix flake check` runs the Go tests (the JS tests join them as they come).
+      # `nix flake check` runs the Go tests; JS tests: node --test "tests/js/*.test.mjs".
       checks = forAll (pkgs: {
         go = pkgs.buildGoModule {
           pname = "kit-tests";

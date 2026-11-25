@@ -24,3 +24,4 @@ The browser files are embedded in the module (`web.Files`) and served under
 ## Tests
 
     go test ./...
+    node --test "tests/js/*.test.mjs"
