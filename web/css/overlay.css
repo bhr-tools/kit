@@ -213,3 +213,15 @@
   from { transform: translateY(100%); }
   to { transform: none; }
 }
+
+/* ==========================================================================
+   ? help (js/help.js)
+   ========================================================================== */
+
+.modal.help { width: min(680px, 100%); }
+.help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; }
+.help-title { margin: 10px 0 4px; font-size: var(--fs-sm); font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.help-group:first-child .help-title, .help-group:nth-child(2) .help-title { margin-top: 0; }
+.help-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 3px 0; font-size: var(--fs-md); }
+.help-keys { display: flex; gap: 4px; }
+@media (max-width: 768px) { .help-grid { grid-template-columns: 1fr; } }
