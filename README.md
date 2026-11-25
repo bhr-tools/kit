@@ -25,3 +25,12 @@ The browser files are embedded in the module (`web.Files`) and served under
 
     go test ./...
     node --test "tests/js/*.test.mjs"
+
+## Demo and browser tests
+
+`cmd/demo` serves a page using every primitive (keys and ? help, undo,
+dialogs, menus, drag to reorder or onto a folder, phone pages and sheets, tab
+bar, lock screen, offline service worker):
+
+    go run ./cmd/demo -no-auth        # http://127.0.0.1:8099
+    tests/e2e/run.sh                  # Playwright from nixpkgs, no Docker

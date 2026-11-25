@@ -1,0 +1,20 @@
+@import url("/kit/css/kit.css");
+
+body { min-height: 100dvh; }
+.large-title { display: flex; align-items: center; gap: 8px; padding: 16px var(--gutter) 8px; }
+.large-title h1 { flex: 1; font-size: var(--fs-xl); }
+.layout { display: flex; gap: 24px; padding: 0 var(--gutter); }
+.folders { display: flex; flex-direction: column; gap: 4px; width: 180px; }
+.folder { display: flex; justify-content: space-between; padding: 6px 10px; border-radius: var(--r); color: var(--text-muted); }
+.folder.active { background: var(--surface-hover); color: var(--text); }
+main { flex: 1; min-width: 0; }
+.list { display: flex; flex-direction: column; gap: 2px; min-height: 40px; }
+.row { display: flex; align-items: center; gap: 10px; min-height: var(--row-h); padding: 0 10px; border-radius: var(--r); cursor: default; }
+.row.cursor { background: var(--tint); box-shadow: var(--ring); }
+.row.selected { background: color-mix(in srgb, var(--select) 18%, transparent); }
+.hint { margin-top: 16px; color: var(--text-dim); font-size: var(--fs-sm); }
+@media (max-width: 768px) {
+  .layout { flex-direction: column; }
+  .folders { flex-direction: row; width: auto; }
+  .hint { display: none; }
+}

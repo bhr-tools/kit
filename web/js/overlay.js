@@ -325,7 +325,9 @@ export function promptDialog(title, { value = '', placeholder = '', okText = 'Sa
       ],
       onClose: () => resolve(answer),
     });
-    requestAnimationFrame(() => input.select());
+    // At once, like the focus: selected a frame later, the text would swallow
+    // the first letters typed right after the shortcut.
+    input.select();
   });
 }
 
