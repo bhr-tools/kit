@@ -208,7 +208,9 @@
   .modal-footer .button { flex: 1; }
 
   .toast { right: 16px; left: 16px; bottom: calc(16px + var(--tabbar-h, 0px) + env(safe-area-inset-bottom)); max-width: none; }
-  body.has-modal .toast { bottom: calc(16px + env(safe-area-inset-bottom)); }
+  /* Above a page's bottom bar (Cancel / Save), never over it. */
+  body.has-modal .toast { bottom: calc(var(--vv-bottom, 0px) + 16px + env(safe-area-inset-bottom)); }
+  body.has-modal:has(.modal-footer) .toast { bottom: calc(var(--vv-bottom, 0px) + 76px + env(safe-area-inset-bottom)); }
 }
 
 @keyframes kit-sheet-up {
