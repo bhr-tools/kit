@@ -13,6 +13,19 @@ import { listGaps, nearestGap, pickDepth, resolveDrop } from './dropgaps.js';
 
 let line = null;
 let ghost = null;
+let dragging = false;
+let deferred = null;
+
+/**
+ * True while a row is dragged: `render` then runs once it is dropped, so
+ * that a list drawn again (a sync) does not pull the row from under the
+ * pointer.
+ */
+export function deferWhileDragging(render) {
+  if (!dragging) return false;
+  deferred = render;
+  return true;
+}
 
 function showLine(pos) {
   line ??= document.body.appendChild(h('div', { class: 'drop-line', hidden: true }));
@@ -56,6 +69,7 @@ function drag(down, row, { key, label, gaps, targets, onDrop, onDropOn, onClick,
   let place = null;
   follow(down, {
     onStart(p) {
+      dragging = true;
       row.classList.add('dragging');
       showGhost(label?.(row), p);
     },
@@ -83,6 +97,10 @@ function drag(down, row, { key, label, gaps, targets, onDrop, onDropOn, onClick,
     place = null;
     showLine(null);
     showGhost(label?.(row), null);
+    dragging = false;
+    const render = deferred;
+    deferred = null;
+    render?.();
   }
 }
 
