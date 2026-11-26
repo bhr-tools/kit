@@ -391,6 +391,19 @@ func (a *Auth) VerifyPassword(password string) (bool, error) {
 	return ok, nil
 }
 
+// PasswordStamp returns an opaque value that changes whenever the master
+// password does ("" when none is set), so a caller checking the password on
+// every request (CalDAV's Basic authentication) can cache a success until
+// then.
+func (a *Auth) PasswordStamp() (string, error) {
+	var stored string
+	err := a.db.QueryRow(`SELECT value FROM auth_settings WHERE key = 'password_hash'`).Scan(&stored)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	return tokenHash(stored), err
+}
+
 // ---------------------------------------------------------------------------
 // Sessions
 // ---------------------------------------------------------------------------

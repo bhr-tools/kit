@@ -171,3 +171,21 @@ func TestLinkSecretIsStable(t *testing.T) {
 		t.Fatalf("%x %x %v", one, two, err)
 	}
 }
+
+func TestPasswordStampChangesWithThePassword(t *testing.T) {
+	a, _ := setup(t, false)
+	if s, err := a.PasswordStamp(); err != nil || s != "" {
+		t.Fatalf("no password: %q %v", s, err)
+	}
+	if err := a.SetInitialPassword("first"); err != nil {
+		t.Fatal(err)
+	}
+	first, _ := a.PasswordStamp()
+	if err := a.SetPassword("second"); err != nil {
+		t.Fatal(err)
+	}
+	second, _ := a.PasswordStamp()
+	if first == "" || first == second {
+		t.Fatalf("stamps %q %q", first, second)
+	}
+}
