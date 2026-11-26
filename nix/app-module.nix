@@ -9,18 +9,25 @@
 #     dbFile = "getdone.db";
 #     # optional:
 #     dataDir = name: if name == "default" || name == "perso" then "/var/lib/getdone" else "/var/lib/getdone-${name}";
-#     extraOptions = lib: { accounts = lib.mkOption { … }; };
-#     extraArgs = inst: [ "-accounts" inst.accounts ];
+#     bin = "getdone-server";                 # binary in $out/bin (default: name)
+#     extraOptions = { lib, pkgs, name, config }: { accounts = lib.mkOption { … }; };
+#     extraArgs = inst: [ "-accounts" "%d/accounts" ];   # %d: systemd credentials
 #     extraServiceConfig = inst: { LoadCredential = …; };
+#     network = true;                         # wait for network-online (remote servers)
 #   };
+#
+# extraOptions gets the instance's name and config, so an option's default
+# may depend on the others.
 { name
 , title
 , package
 , dbFile ? "${name}.db"
 , dataDir ? (instance: "/var/lib/${name}-${instance}")
-, extraOptions ? (lib: { })
+, bin ? name
+, extraOptions ? (args: { })
 , extraArgs ? (inst: [ ])
 , extraServiceConfig ? (inst: { })
+, network ? false
 }:
 { config, lib, pkgs, ... }:
 let
@@ -80,7 +87,7 @@ in
             default = false;
             description = "Open the port in the NixOS firewall.";
           };
-        } // extraOptions lib;
+        } // extraOptions { inherit lib pkgs name config; };
       }));
       default = { };
       description = "Independent ${title} instances.";
@@ -110,11 +117,12 @@ in
       (instance: inst:
         lib.nameValuePair (if instance == "default" then name else "${name}-${instance}") {
           description = "${title} (${instance})";
-          after = [ "network.target" ];
+          after = [ (if network then "network-online.target" else "network.target") ];
+          wants = lib.optional network "network-online.target";
           wantedBy = [ "multi-user.target" ];
           serviceConfig = {
             ExecStart = lib.escapeShellArgs ([
-              "${cfg.package}/bin/${name}"
+              "${cfg.package}/bin/${bin}"
               "-host" inst.host
               "-port" (toString inst.port)
               "-data-dir" (toString inst.dataDir)
