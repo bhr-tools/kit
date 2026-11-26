@@ -138,10 +138,12 @@ export function sortable(container, { handle = null, indent = 0, depthOf = () =>
 /**
  * Lets the rows of `container` (children with data-key, or `rows` selector)
  * be dropped on targets: { targets(), label(row), onDropOn({ key, target }) }.
+ * accept(down) may refuse a drag (no target on screen: the row keeps its
+ * other gestures, a swipe for instance).
  */
-export function draggable(container, { rows = '[data-key]', targets, label, onDropOn }) {
+export function draggable(container, { rows = '[data-key]', targets, label, onDropOn, accept = () => true }) {
   container.addEventListener('pointerdown', (down) => {
-    if (down.button !== 0) return;
+    if (down.button !== 0 || !accept(down)) return;
     const row = down.target.closest(rows);
     if (!row || !container.contains(row)) return;
     if (down.target.closest('input, textarea, select, [contenteditable]')) return;
