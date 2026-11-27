@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"crypto/sha256"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -123,6 +124,24 @@ func TestOutdatedHashIsUpgraded(t *testing.T) {
 	}
 	if ok, _ := a.VerifyPassword("secret"); !ok {
 		t.Fatal("upgraded hash refused")
+	}
+}
+
+func TestFocusFirstHashIsUpgraded(t *testing.T) {
+	a, _ := setup(t, false)
+	salt := []byte("0123456789abcdef")
+	sum := sha256.Sum256(append(append([]byte{}, salt...), "secret"...))
+	a.db.Exec(`INSERT INTO auth_settings (key, value) VALUES ('password_hash', ?)`, "s1$"+hexs(salt)+"$"+hexs(sum[:]))
+	if ok, _ := a.VerifyPassword("wrong"); ok {
+		t.Fatal("wrong password accepted")
+	}
+	if ok, _ := a.VerifyPassword("secret"); !ok {
+		t.Fatal("Focus hash refused")
+	}
+	var stored string
+	a.db.QueryRow(`SELECT value FROM auth_settings WHERE key = 'password_hash'`).Scan(&stored)
+	if !strings.HasPrefix(stored, "v2$600000$") {
+		t.Fatalf("not upgraded: %s", stored)
 	}
 }
 

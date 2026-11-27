@@ -258,6 +258,7 @@ func isHTTPS(r *http.Request) bool {
 //
 //	v2$<iterations>$<salt hex>$<key hex>   standard PBKDF2-HMAC-SHA256
 //	<salt hex>$<key hex>                   GetDone's first release (non-standard PBKDF2 variant)
+//	s1$<salt hex>$<sha256 hex>             Focus's first release: SHA-256(salt + password)
 //
 // Outdated hashes are verified as before and replaced by a v2 hash with
 // today's iterations on the next successful login.
@@ -291,6 +292,16 @@ func checkPassword(password, stored string) (ok, outdated bool) {
 			return false, false
 		}
 		return subtle.ConstantTimeCompare(got, want) == 1, iterations < pbkdf2Iterations
+	case len(parts) == 3 && parts[0] == "s1":
+		salt, errSalt := hex.DecodeString(parts[1])
+		want, errKey := hex.DecodeString(parts[2])
+		if errSalt != nil || errKey != nil {
+			return false, false
+		}
+		h := sha256.New()
+		h.Write(salt)
+		h.Write([]byte(password))
+		return subtle.ConstantTimeCompare(h.Sum(nil), want) == 1, true
 	case len(parts) == 2:
 		salt, errSalt := hex.DecodeString(parts[0])
 		want, errKey := hex.DecodeString(parts[1])
