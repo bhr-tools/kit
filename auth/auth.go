@@ -543,11 +543,22 @@ func (a *Auth) RequestAppToken(r *http.Request) *AppToken {
 	if err != nil {
 		return nil
 	}
-	t.CreatedAt, _ = time.Parse(time.DateTime, created)
+	t.CreatedAt, _ = parseTime(created)
 	now := time.Now().UTC()
 	t.UsedAt = &now
 	_, _ = a.db.Exec(`UPDATE kit_app_tokens SET used_at = ? WHERE id = ?`, now.Format(time.DateTime), t.ID)
 	return &t
+}
+
+// parseTime reads a stored time: the SQLite driver hands DATETIME columns
+// back as RFC 3339, whatever text was written.
+func parseTime(s string) (time.Time, error) {
+	for _, layout := range []string{time.RFC3339Nano, time.DateTime} {
+		if t, err := time.Parse(layout, s); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("unreadable time %q", s)
 }
 
 // AppTokens lists the tokens, newest first.
@@ -565,9 +576,9 @@ func (a *Auth) AppTokens() ([]AppToken, error) {
 		if err := rows.Scan(&t.ID, &t.Name, &t.Scope, &created, &used); err != nil {
 			return nil, err
 		}
-		t.CreatedAt, _ = time.Parse(time.DateTime, created)
+		t.CreatedAt, _ = parseTime(created)
 		if used.Valid {
-			u, _ := time.Parse(time.DateTime, used.String)
+			u, _ := parseTime(used.String)
 			t.UsedAt = &u
 		}
 		tokens = append(tokens, t)

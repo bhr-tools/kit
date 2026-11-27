@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/bhr-tools/kit/store"
 )
@@ -162,7 +163,7 @@ func TestAppTokens(t *testing.T) {
 		t.Fatal("unknown token accepted")
 	}
 	list, _ := a.AppTokens()
-	if len(list) != 1 || list[0].UsedAt == nil {
+	if len(list) != 1 || list[0].UsedAt == nil || time.Since(list[0].CreatedAt) > time.Minute || time.Since(*list[0].UsedAt) > time.Minute {
 		t.Fatalf("list: %+v", list)
 	}
 	if err := a.DeleteAppToken(list[0].ID); err != nil {
